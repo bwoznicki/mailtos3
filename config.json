@@ -1,0 +1,19 @@
+{
+    "requestConfig": {
+        "region": "eu-west-1",
+        "timeout": 10,
+        "endpoint": false
+    },
+    "mailboxes": [
+        {
+            "address": "user1@mail.co.uk",
+            "bucket": "mailbox1",
+            "cmkKeyArn": "arn:aws:kms:eu-west-1:123456789:key/777777-7777-7777-7777-77777777"
+        },
+        {
+            "address": "user2@mail.co.uk",
+            "bucket": "mailbox2",
+            "cmkKeyArn": "arn:aws:kms:eu-west-1:123456789:key/777777-7777-7777-7777-77777777"
+        }
+    ]
+}
