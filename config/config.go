@@ -1,30 +1,35 @@
 package config
 
 import (
-	"../logger"
-	"../sysexits"
 	"encoding/json"
 	"os"
 	"strings"
+
+	"mailtos3/logger"
+	"mailtos3/sysexits"
 )
 
+// Config is the main app config
 type Config struct {
 	RequestConfig RequestConfig `json:"requestConfig"`
 	Mailboxes     []Mailbox     `json:"mailboxes"`
 }
 
+// RequestConfig holds the configuration for the request to aws api
 type RequestConfig struct {
 	Region   string `json:"region"`
 	Timeout  int    `json:"timeout"`
 	Endpoint bool   `json:"endpoint"`
 }
 
+// Mailbox hold the configuration for individual mailbox settings
 type Mailbox struct {
 	Address   string `json:"address"`
 	Bucket    string `json:"bucket"`
 	CmkKeyArn string `json:"cmkKeyArn"`
 }
 
+// Load loads the local config
 func Load() Config {
 
 	var config Config

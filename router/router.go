@@ -1,10 +1,12 @@
 package router
 
 import (
-	"../config"
 	"strings"
+
+	"mailtos3/config"
 )
 
+// MatchMailbox returns the mailbox configuration from config
 func MatchMailbox(mailboxes []config.Mailbox, emailAddress string) (*config.Mailbox, bool) {
 	for _, mailbox := range mailboxes {
 		if strings.EqualFold(mailbox.Address, emailAddress) {

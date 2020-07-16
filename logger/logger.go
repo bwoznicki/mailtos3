@@ -1,11 +1,13 @@
 package logger
 
 import (
-	"../sysexits"
 	"log"
 	"os"
+
+	"mailtos3/sysexits"
 )
 
+// Log custom logger
 var Log *log.Logger
 
 func init() {

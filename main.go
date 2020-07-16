@@ -1,17 +1,19 @@
 package main
 
 import (
-	"./bucket"
-	"./config"
-	"./logger"
-	"./router"
-	"./sysexits"
 	"errors"
 	"flag"
 	"io/ioutil"
 	"os"
+
+	"mailtos3/bucket"
+	"mailtos3/config"
+	"mailtos3/logger"
+	"mailtos3/router"
+	"mailtos3/sysexits"
 )
 
+// Conf hold the local configuration for mailtos3
 var Conf config.Config
 var address string
 
@@ -65,7 +67,7 @@ func getBody() (string, error) {
 
 		bytes, err := ioutil.ReadAll(os.Stdin)
 		if err != nil {
-			return "", errors.New("mailtos3 error reading from stdin.")
+			return "", errors.New("mailtos3 error reading from stdin")
 		}
 		return string(bytes), nil
 
@@ -74,7 +76,7 @@ func getBody() (string, error) {
 		// nothing passed from pipe check args instead
 		args := flag.Args()
 		if len(args) != 1 {
-			return "", errors.New("mailtos3 expects message body to be passed as the last argument or from stdin.")
+			return "", errors.New("mailtos3 expects message body to be passed as the last argument or from stdin")
 		}
 		return args[0], nil
 	}

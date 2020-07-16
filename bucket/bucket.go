@@ -1,13 +1,19 @@
 package bucket
 
 import (
-	"../config"
-	"../logger"
-	"../sysexits"
 	"context"
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+
+	"mailtos3/config"
+	"mailtos3/logger"
+	"mailtos3/sysexits"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/request"
@@ -15,10 +21,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/kms"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3crypto"
-	"os"
-	"strconv"
-	"strings"
-	"time"
 )
 
 func PutObject(config *config.RequestConfig, address *string, msgBody *string, bucket *string, cmkArn *string) bool {
