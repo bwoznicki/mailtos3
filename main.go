@@ -16,14 +16,19 @@ import (
 // Conf hold the local configuration for mailtos3
 var Conf config.Config
 var address string
+var from string
 
 func init() {
 	// get the configuration file, set region, flags and mail routes
 	Conf = config.Load()
 
-	usage := "email address for the receiving mailbox"
-	flag.StringVar(&address, "address", "CatchAll", usage)
-	flag.StringVar(&address, "a", "CatchAll", usage+" (shorthand)")
+	usageA := "email address for the receiving mailbox"
+	flag.StringVar(&address, "address", "CatchAll", usageA)
+	flag.StringVar(&address, "a", "CatchAll", usageA+" (shorthand)")
+
+	usageF := "sender address, pass postfix ${sasl_sender} or ${sender}"
+	flag.StringVar(&from, "from", "", usageF)
+	flag.StringVar(&from, "f", "", usageF+" (shorthand)")
 }
 
 func main() {
@@ -31,7 +36,7 @@ func main() {
 	// retrieve the flags
 	flag.Parse()
 
-	logger.Log.Printf("[INFO] processing message for: %s", address)
+	logger.Log.Printf("[INFO] processing message from=<%s> to=<%s>", from, address)
 
 	// find matching mailbox
 	// if matching mailbox found read body and pass to put object

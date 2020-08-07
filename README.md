@@ -58,14 +58,14 @@ Without the key message body will be saved in plain text.
 ## Usage
 To pass message body from MTA to s3: ( this is the same for local testing )
 ```
-mailtos3 -a=user@host.co.uk "message body"
+mailtos3 -a=user@host.co.uk -f=from@host.co.uk "message body"
 // or from pipe
-echo "message body" | mailtos3 -a=user@host.co.uk
+echo "message body" | mailtos3 -a=user@host.co.uk -f=from@host.co.uk
 ```
 Postfix master.cf  
 ```
 mailtos3  unix  -       n       n       -       -       pipe
-      flags=ODRhu user=mailtos3 argv=/usr/local/bin/mailtos3/mailtos3 -a ${recipient}
+      flags=ODRhu user=mailtos3 argv=/usr/local/bin/mailtos3/mailtos3 -a=${recipient} -f=${sender}
 ```
 this will store message for **user@host.co.uk** in **my_bucket**
 
