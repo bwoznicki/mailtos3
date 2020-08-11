@@ -2,11 +2,9 @@ package bucket
 
 import (
 	"context"
-	"crypto/sha1"
-	"encoding/hex"
 	"fmt"
 	"os"
-	"strconv"
+	"path"
 	"strings"
 	"time"
 
@@ -23,7 +21,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3crypto"
 )
 
-func PutObject(config *config.RequestConfig, address *string, msgBody *string, bucket *string, cmkArn *string) bool {
+func PutObject(config *config.RequestConfig, address *string, msgBody *string, bucket *string, object string, cmkArn *string, prefix string) bool {
 
 	var endpoint string
 	if config.Endpoint {
@@ -35,11 +33,12 @@ func PutObject(config *config.RequestConfig, address *string, msgBody *string, b
 		Endpoint: aws.String(endpoint),
 	})
 
-	genName := generateNameHash()
+	objectKey := path.Join(prefix, object)
+
 	input := &s3.PutObjectInput{
 		Body:   aws.ReadSeekCloser(strings.NewReader(*msgBody)),
 		Bucket: aws.String(*bucket),
-		Key:    aws.String(genName),
+		Key:    aws.String(objectKey),
 	}
 
 	// Create a context with a timeout that will abort the upload if it takes
@@ -59,7 +58,7 @@ func PutObject(config *config.RequestConfig, address *string, msgBody *string, b
 	// get body size
 	size := getBodySize(msgBody)
 
-	logger.Log.Printf("[INFO] sending %s to %s", genName, *bucket)
+	logger.Log.Printf("[INFO] sending %s to %s", objectKey, *bucket)
 
 	// time the transfer
 	timer := time.Now()
@@ -90,7 +89,7 @@ func PutObject(config *config.RequestConfig, address *string, msgBody *string, b
 		os.Exit(sysexits.EX_UNAVAILABLE)
 
 	}
-	logger.Log.Printf("[INFO] transfer complete for %s, %s sent in %v", genName, size, time.Since(timer))
+	logger.Log.Printf("[INFO] transfer complete for %s, %s sent in %v", objectKey, size, time.Since(timer))
 	return true
 }
 
@@ -110,14 +109,6 @@ func getClient(s *session.Session, cmkArn *string) interface{} {
 		client = s3.New(s)
 	}
 	return client
-}
-
-func generateNameHash() string {
-	// get the sha1 string from current unix time
-	h := sha1.New()
-	s := strconv.FormatInt(time.Now().UnixNano(), 10)
-	h.Write([]byte(s))
-	return hex.EncodeToString(h.Sum(nil))
 }
 
 func getBodySize(body *string) string {

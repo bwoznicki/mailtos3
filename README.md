@@ -33,7 +33,9 @@ Each **mailbox** mapping consists of:
 - **address** `string` email address that the message is addressed to
 - **bucket** `string` bucket name to store the massage in
 - **cmkKeyArn** (optional) `string` if specified mailtos3 will use server side encryption before storing the message in the bucket.  
-Without the key message body will be saved in plain text.
+Without the key, message body will be saved in plain text.
+- **prefix** (optional) `string` prefix to be added to objects of particular mailbox. Any string can be added and also GO **time.Now()** formatted just like regular date time **layout**  
+example: "prefix": "dateTimeFormat(20060102)" object will be saved as 20200811/objectKey
 ```json
 {
     "requestConfig": {
@@ -46,11 +48,13 @@ Without the key message body will be saved in plain text.
             "address": "user@host.co.uk",
             "bucket": "my_bucket",
             "cmkKeyArn": "arn:aws:kms:eu-west-1:123456:key/123456-123456-123456" // cmkKey is optional
+            "prefix": "user"
         },
         {
             "address": "user2@host.co.uk",
             "bucket": "my_bucket2",
             "cmkKeyArn": "arn:aws:kms:eu-west-1:123456:key/123456-123456-123456" // cmkKey is optional
+            "prefix": "dateTimeFormat(20060102)"
         }
     ]
 }
@@ -102,6 +106,7 @@ Create folder for the binaries and config, and place your files in there:
 sudo mkdir /usr/local/bin/mailtos3
 sudo chown mailtos3:mailtos3 /usr/local/bin/mailtos3
 ```
+Copy build artifacts to /usr/local/bin/mailtos3, and create your config.json file in the same dir.
 Reload virtual maps and postfix
 ```
 sudo postmap /etc/postfix/virtual_mailbox

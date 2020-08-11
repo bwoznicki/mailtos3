@@ -1,10 +1,17 @@
 package main
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"errors"
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
 
 	"mailtos3/bucket"
 	"mailtos3/config"
@@ -36,7 +43,9 @@ func main() {
 	// retrieve the flags
 	flag.Parse()
 
-	logger.Log.Printf("[INFO] processing message from=<%s> to=<%s>", from, address)
+	objectKey := generateNameHash()
+
+	logger.Log.Printf("[INFO] processing message from=%s, to=%s, object=%s", from, address, objectKey)
 
 	// find matching mailbox
 	// if matching mailbox found read body and pass to put object
@@ -50,7 +59,9 @@ func main() {
 			os.Exit(sysexits.EX_NOINPUT)
 		}
 
-		bucket.PutObject(&Conf.RequestConfig, &address, &msgBody, &m.Bucket, &m.CmkKeyArn)
+		prefix := formatPrefix(m.Prefix)
+
+		bucket.PutObject(&Conf.RequestConfig, &address, &msgBody, &m.Bucket, objectKey, &m.CmkKeyArn, prefix)
 
 	} else {
 		logger.Log.Printf("[WARNING] mailbox not found for: %s", address)
@@ -76,13 +87,34 @@ func getBody() (string, error) {
 		}
 		return string(bytes), nil
 
-	} else {
-
-		// nothing passed from pipe check args instead
-		args := flag.Args()
-		if len(args) != 1 {
-			return "", errors.New("mailtos3 expects message body to be passed as the last argument or from stdin")
-		}
-		return args[0], nil
 	}
+
+	// nothing passed from pipe check args instead
+	args := flag.Args()
+	if len(args) != 1 {
+		return "", errors.New("mailtos3 expects message body to be passed as the last argument or from stdin")
+	}
+	return args[0], nil
+
+}
+
+func formatPrefix(prefix string) string {
+	re, err := regexp.Compile(`^dateTimeFormat\(.+\)$`)
+	if err != nil {
+		logger.Log.Printf("[WARNING] Unable to compile regex, prefix will be dropped, %s", fmt.Sprint(err))
+		return ""
+	}
+	if re.MatchString(prefix) {
+		dateLayout := strings.TrimLeft(strings.TrimRight(prefix, ")"), "dateTimeFormat(")
+		return time.Now().Format(dateLayout)
+	}
+	return prefix
+}
+
+func generateNameHash() string {
+	// get the sha1 string from current unix time
+	h := sha1.New()
+	s := strconv.FormatInt(time.Now().UnixNano(), 10)
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
 }

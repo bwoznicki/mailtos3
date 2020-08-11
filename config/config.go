@@ -27,6 +27,7 @@ type Mailbox struct {
 	Address   string `json:"address"`
 	Bucket    string `json:"bucket"`
 	CmkKeyArn string `json:"cmkKeyArn"`
+	Prefix    string `json:"prefix"`
 }
 
 // Load loads the local config
