@@ -6,7 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"regexp"
 	"strconv"
@@ -81,7 +81,7 @@ func getBody() (string, error) {
 	// if we have something on stdin read until EOF
 	if info.Mode()&os.ModeNamedPipe != 0 {
 
-		bytes, err := ioutil.ReadAll(os.Stdin)
+		bytes, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			return "", errors.New("mailtos3 error reading from stdin")
 		}
